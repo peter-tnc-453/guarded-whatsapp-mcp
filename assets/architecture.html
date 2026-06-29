@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1200">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: 1200px;
+    height: 500px;
+    background: #0d1117;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Helvetica Neue", sans-serif;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  /* Very subtle background grid */
+  body::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+  }
+
+  body::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 800px 400px at 50% 50%, rgba(37,211,102,0.025) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .diagram {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    width: 100%;
+    padding: 0 56px;
+  }
+
+  /* ─── NODES ─── */
+
+  .node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+
+  .node-box {
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.07);
+    background: rgba(255,255,255,0.03);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 18px 20px;
+  }
+
+  .node-label {
+    font-size: 9px;
+    font-weight: 500;
+    color: #4a5568;
+    letter-spacing: 0.03em;
+    text-align: center;
+    margin-top: 4px;
+  }
+
+  /* AI Agent node */
+  .node-agent .node-box {
+    width: 130px;
+    height: 96px;
+    border-color: rgba(74,158,255,0.15);
+    background: rgba(74,158,255,0.04);
+  }
+
+  .node-agent .box-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: #6aabf0;
+    text-align: center;
+    line-height: 1.3;
+  }
+
+  .node-agent .box-sub {
+    font-size: 9px;
+    color: #3a5570;
+    font-weight: 400;
+    text-align: center;
+    font-family: ui-monospace, monospace;
+    letter-spacing: 0.01em;
+  }
+
+  /* WhatsApp Bridge node */
+  .node-bridge .node-box {
+    width: 120px;
+    height: 72px;
+    border-color: rgba(255,255,255,0.06);
+    background: rgba(255,255,255,0.02);
+  }
+
+  .node-bridge .box-title {
+    font-size: 12px;
+    font-weight: 500;
+    color: #8a9ab0;
+    text-align: center;
+    line-height: 1.3;
+  }
+
+  /* WhatsApp end node */
+  .node-wa .node-box {
+    width: 100px;
+    height: 72px;
+    border-color: rgba(37,211,102,0.15);
+    background: rgba(37,211,102,0.03);
+  }
+
+  .node-wa .box-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: #4fcf84;
+    text-align: center;
+  }
+
+  /* ─── ARROW ─── */
+  .arrow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+
+  .arrow-line {
+    height: 1px;
+    background: rgba(255,255,255,0.1);
+    position: relative;
+  }
+
+  .arrow-line::after {
+    content: '';
+    position: absolute;
+    right: -1px;
+    top: -4px;
+    border-left: 7px solid rgba(255,255,255,0.15);
+    border-top: 4px solid transparent;
+    border-bottom: 4px solid transparent;
+  }
+
+  .arrow-label {
+    font-size: 9px;
+    font-weight: 500;
+    color: #2a3844;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    font-family: ui-monospace, monospace;
+  }
+
+  .arrow.green .arrow-line {
+    background: rgba(37,211,102,0.2);
+  }
+  .arrow.green .arrow-line::after {
+    border-left-color: rgba(37,211,102,0.3);
+  }
+  .arrow.green .arrow-label { color: rgba(37,211,102,0.35); }
+
+  /* ─── CENTER: GUARD BOX ─── */
+  .guard-wrap {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .guard-box {
+    width: 100%;
+    max-width: 540px;
+    border-radius: 10px;
+    border: 1px solid rgba(37,211,102,0.2);
+    background: rgba(37,211,102,0.025);
+    padding: 20px 24px 22px;
+    position: relative;
+  }
+
+  /* Top label strip */
+  .guard-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 18px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .guard-icon {
+    width: 26px;
+    height: 26px;
+    flex-shrink: 0;
+  }
+
+  .guard-name {
+    font-family: "SF Mono", "Fira Code", ui-monospace, monospace;
+    font-size: 15px;
+    font-weight: 600;
+    color: #c8d4e3;
+    letter-spacing: -0.3px;
+  }
+
+  .guard-name .prefix { color: #4a9eff; }
+
+  .guard-badge {
+    margin-left: auto;
+    padding: 3px 8px;
+    border-radius: 4px;
+    border: 1px solid rgba(37,211,102,0.2);
+    font-size: 9px;
+    font-weight: 600;
+    color: rgba(37,211,102,0.6);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-family: ui-monospace, monospace;
+    background: rgba(37,211,102,0.05);
+  }
+
+  /* 6 layers grid */
+  .layers {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+  }
+
+  .layer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    border: 1px solid rgba(255,255,255,0.05);
+    background: rgba(255,255,255,0.02);
+  }
+
+  .layer-icon {
+    width: 13px;
+    height: 13px;
+    flex-shrink: 0;
+    color: #5a7a90;
+  }
+
+  .layer-text {
+    font-size: 12px;
+    font-weight: 500;
+    color: #7a8fa6;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+  }
+
+  /* color variants */
+  .layer.pass {
+    border-color: rgba(37,211,102,0.1);
+  }
+  .layer.pass .layer-text { color: #5aae7a; }
+  .layer.pass .layer-icon { color: #3a9060; }
+
+  .layer.check {
+    border-color: rgba(74,158,255,0.1);
+  }
+  .layer.check .layer-text { color: #5a90c0; }
+  .layer.check .layer-icon { color: #3a70a0; }
+
+  .layer.teal {
+    border-color: rgba(45,190,180,0.1);
+  }
+  .layer.teal .layer-text { color: #4a9a94; }
+  .layer.teal .layer-icon { color: #2a7a74; }
+
+  /* flow label below */
+  .flow-label {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255,255,255,0.04);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 9px;
+    font-weight: 500;
+    color: #2a3a4a;
+    letter-spacing: 0.03em;
+    font-family: ui-monospace, monospace;
+  }
+
+  .flow-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: rgba(37,211,102,0.25);
+    flex-shrink: 0;
+  }
+
+  /* Title bar at the very top of diagram area */
+  .diagram-title {
+    position: absolute;
+    top: 24px;
+    left: 56px;
+    font-size: 9px;
+    font-weight: 500;
+    color: #2a3848;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-family: ui-monospace, monospace;
+  }
+
+  /* SVG icons inside boxes */
+  .agent-svg { color: #4a9eff; }
+  .wa-svg { color: #25D366; }
+  .bridge-svg { color: #6a8090; }
+</style>
+</head>
+<body>
+
+<div class="diagram-title">Architecture — Message Flow</div>
+
+<div class="diagram">
+
+  <!-- Node: AI Agent -->
+  <div class="node node-agent">
+    <div class="node-box">
+      <svg class="agent-svg" width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="16" height="16" rx="3"/>
+        <circle cx="8" cy="9" r="1.5"/>
+        <circle cx="14" cy="9" r="1.5"/>
+        <path d="M7 14c0-2 2-3 4-3s4 1 4 3"/>
+      </svg>
+      <div class="box-title">AI Agent<br/>/ MCP Client</div>
+    </div>
+    <div class="node-label">any LLM agent</div>
+  </div>
+
+  <!-- Arrow 1: agent → guard -->
+  <div class="arrow" style="width:52px;">
+    <div class="arrow-label">request</div>
+    <div class="arrow-line" style="width:52px;"></div>
+  </div>
+
+  <!-- Center: Guard box -->
+  <div class="guard-wrap">
+    <div class="guard-box">
+
+      <div class="guard-header">
+        <!-- Shield icon -->
+        <svg class="guard-icon" viewBox="0 0 26 26" fill="none" stroke="rgba(37,211,102,0.65)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M13 2L22 6V13C22 18.5 17.5 23 13 24C8.5 23 4 18.5 4 13V6Z"/>
+          <rect x="9.5" y="14" width="7" height="6" rx="1.2"/>
+          <path d="M10.5 14V11.5A2.5 2.5 0 0115.5 11.5V14"/>
+          <circle cx="13" cy="17" r="1"/>
+        </svg>
+        <span class="guard-name"><span class="prefix">guarded-</span>whatsapp-mcp</span>
+        <span class="guard-badge">Security Layer</span>
+      </div>
+
+      <div class="layers">
+
+        <!-- Allowlist -->
+        <div class="layer pass">
+          <svg class="layer-icon" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1.5 6.5l3 3L11.5 2.5"/>
+          </svg>
+          <span class="layer-text">Allowlist</span>
+        </div>
+
+        <!-- Secret Scan -->
+        <div class="layer check">
+          <svg class="layer-icon" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+            <circle cx="5.5" cy="5.5" r="3.2"/>
+            <path d="M8 8l3 3"/>
+          </svg>
+          <span class="layer-text">Secret Scan</span>
+        </div>
+
+        <!-- File Validation -->
+        <div class="layer teal">
+          <svg class="layer-icon" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 1.5h6.5L11 4v8H2z"/>
+            <path d="M8 1.5v3h3"/>
+            <path d="M4 7h5M4 9h3"/>
+          </svg>
+          <span class="layer-text">File Validation</span>
+        </div>
+
+        <!-- Rate Limit -->
+        <div class="layer check">
+          <svg class="layer-icon" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+            <circle cx="6.5" cy="6.5" r="4.5"/>
+            <path d="M6.5 3.5v3l2 1.5"/>
+          </svg>
+          <span class="layer-text">Rate Limit</span>
+        </div>
+
+        <!-- Confirm Gate -->
+        <div class="layer pass">
+          <svg class="layer-icon" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="6.5" width="9" height="5.5" rx="1"/>
+            <path d="M4 6.5V4.5a2.5 2.5 0 015 0V6.5"/>
+          </svg>
+          <span class="layer-text">Confirm Gate</span>
+        </div>
+
+        <!-- Audit Log -->
+        <div class="layer teal">
+          <svg class="layer-icon" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+            <path d="M1.5 2.5h10M1.5 5.5h7M1.5 8.5h5M1.5 11.5h8"/>
+          </svg>
+          <span class="layer-text">Audit Log</span>
+        </div>
+
+      </div>
+
+      <div class="flow-label">
+        <div class="flow-dot"></div>
+        every message passes all 6 gates sequentially
+        <div class="flow-dot"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Arrow 2: guard → bridge -->
+  <div class="arrow green" style="width:52px;">
+    <div class="arrow-label">verified</div>
+    <div class="arrow-line" style="width:52px;"></div>
+  </div>
+
+  <!-- Node: WhatsApp Bridge -->
+  <div class="node node-bridge">
+    <div class="node-box">
+      <svg class="bridge-svg" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="4" cy="9" r="2"/>
+        <circle cx="14" cy="4" r="2"/>
+        <circle cx="14" cy="14" r="2"/>
+        <path d="M6 8.3L12 5.3M6 9.7L12 12.7"/>
+      </svg>
+      <div class="box-title">WhatsApp<br/>Bridge</div>
+    </div>
+    <div class="node-label">e.g. whatsapp-web.js</div>
+  </div>
+
+  <!-- Arrow 3: bridge → WhatsApp -->
+  <div class="arrow green" style="width:44px;">
+    <div class="arrow-line" style="width:44px;"></div>
+  </div>
+
+  <!-- Node: WhatsApp -->
+  <div class="node node-wa">
+    <div class="node-box">
+      <svg class="wa-svg" width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 18L5.5 13.5A7.5 7.5 0 1111 18.5l.1-.5L4 18z"/>
+        <path d="M8 9.5C8 9 8.3 8 9.5 8c1 0 1.5.8 1.5 1.5 0 1.5-2 2-2 3.5h2M11 14.5v.5"/>
+      </svg>
+      <div class="box-title">WhatsApp</div>
+    </div>
+    <div class="node-label">recipient</div>
+  </div>
+
+</div>
+
+</body>
+</html>

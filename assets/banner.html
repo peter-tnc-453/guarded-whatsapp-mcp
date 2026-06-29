@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: 1280px;
+    height: 640px;
+    background: #0b0f14;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Helvetica Neue", sans-serif;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Subtle noise texture overlay */
+  body::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 600px 400px at 75% 50%, rgba(37,211,102,0.04) 0%, transparent 70%),
+      radial-gradient(ellipse 400px 300px at 10% 80%, rgba(0,149,255,0.03) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .layout {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    height: 100%;
+    padding: 0 80px 0 88px;
+    gap: 0;
+  }
+
+  /* LEFT — text content */
+  .left {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0;
+  }
+
+  .eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 28px;
+  }
+
+  .eyebrow-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #25D366;
+  }
+
+  .eyebrow-label {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    color: #25D366;
+    text-transform: uppercase;
+  }
+
+  .project-name {
+    font-family: "SF Mono", "Fira Code", "Cascadia Code", "Consolas", ui-monospace, monospace;
+    font-size: 42px;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+    color: #f0f2f5;
+    line-height: 1.1;
+    margin-bottom: 18px;
+  }
+
+  .project-name .prefix {
+    color: #4a9eff;
+  }
+
+  .project-name .guard {
+    color: #f0f2f5;
+  }
+
+  .tagline {
+    font-size: 19px;
+    font-weight: 400;
+    color: #8a9ab0;
+    line-height: 1.45;
+    max-width: 520px;
+    margin-bottom: 44px;
+  }
+
+  .tagline strong {
+    color: #c8d4e3;
+    font-weight: 500;
+  }
+
+  /* 6 guardrail chips */
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    max-width: 540px;
+  }
+
+  .chip {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid rgba(255,255,255,0.07);
+    background: rgba(255,255,255,0.03);
+    font-size: 12px;
+    font-weight: 500;
+    color: #7a8fa6;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+  }
+
+  .chip svg {
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
+  }
+
+  .chip.green { border-color: rgba(37,211,102,0.18); color: #4fcf84; }
+  .chip.blue  { border-color: rgba(74,158,255,0.15); color: #6aabf0; }
+  .chip.teal  { border-color: rgba(45,190,180,0.18); color: #4dbcb4; }
+
+  /* RIGHT — hero motif */
+  .right {
+    width: 420px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  /* Halo rings behind shield */
+  .halo {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px solid rgba(37,211,102,0.06);
+  }
+  .halo-1 { width: 340px; height: 340px; }
+  .halo-2 { width: 260px; height: 260px; border-color: rgba(37,211,102,0.09); }
+  .halo-3 { width: 190px; height: 190px; border-color: rgba(37,211,102,0.12); }
+
+  .shield-wrap {
+    position: relative;
+    z-index: 2;
+  }
+
+  /* Subtle top separator line */
+  .top-border {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, rgba(37,211,102,0.3) 30%, rgba(74,158,255,0.2) 70%, transparent 100%);
+  }
+
+  /* Bottom metadata row */
+  .meta-row {
+    position: absolute;
+    bottom: 28px;
+    left: 88px;
+    right: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .meta-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .meta-item {
+    font-size: 11px;
+    color: #3a4a5c;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+
+  .meta-sep {
+    width: 1px;
+    height: 12px;
+    background: rgba(255,255,255,0.07);
+  }
+
+  .badge-mcp {
+    padding: 4px 10px;
+    border-radius: 4px;
+    border: 1px solid rgba(74,158,255,0.2);
+    font-size: 10px;
+    font-weight: 600;
+    color: #4a9eff;
+    letter-spacing: 0.06em;
+    font-family: ui-monospace, monospace;
+    background: rgba(74,158,255,0.05);
+  }
+</style>
+</head>
+<body>
+
+<div class="top-border"></div>
+
+<div class="layout">
+  <!-- LEFT: text -->
+  <div class="left">
+    <div class="eyebrow">
+      <div class="eyebrow-dot"></div>
+      <span class="eyebrow-label">MCP Server · Security Layer</span>
+    </div>
+
+    <div class="project-name">
+      <span class="prefix">guarded-</span><span class="guard">whatsapp-mcp</span>
+    </div>
+
+    <p class="tagline">
+      Govern &amp; automate WhatsApp <strong>safely</strong> for AI agents.<br>
+      Every message passes through a verifiable security layer<br>before it reaches the wire.
+    </p>
+
+    <div class="chips">
+      <!-- allowlist -->
+      <div class="chip green">
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 7l3.5 3.5L12 3.5"/>
+        </svg>
+        Allowlist
+      </div>
+      <!-- secret scan -->
+      <div class="chip blue">
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+          <circle cx="6" cy="6" r="3.5"/>
+          <path d="M9 9l3 3"/>
+        </svg>
+        Secret Scan
+      </div>
+      <!-- file validation -->
+      <div class="chip teal">
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 2h6l2 2v9H3z"/>
+          <path d="M8 2v3h3"/>
+          <path d="M5 7.5h4M5 9.5h2.5"/>
+        </svg>
+        File Validation
+      </div>
+      <!-- rate limit -->
+      <div class="chip blue">
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+          <circle cx="7" cy="7" r="5"/>
+          <path d="M7 4v3.5l2 1.5"/>
+        </svg>
+        Rate Limit
+      </div>
+      <!-- confirm gate -->
+      <div class="chip green">
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2.5" y="6.5" width="9" height="6" rx="1"/>
+          <path d="M4.5 6.5V4.5a2.5 2.5 0 015 0v2"/>
+        </svg>
+        Confirm Gate
+      </div>
+      <!-- audit log -->
+      <div class="chip teal">
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 3h10M2 6h7M2 9h5M2 12h8"/>
+        </svg>
+        Audit Log
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: shield motif -->
+  <div class="right">
+    <div class="halo halo-1"></div>
+    <div class="halo halo-2"></div>
+    <div class="halo halo-3"></div>
+
+    <div class="shield-wrap">
+      <svg width="200" height="220" viewBox="0 0 200 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Outer shield glow -->
+        <defs>
+          <filter id="glow-shield" x="-30%" y="-30%" width="160%" height="160%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur"/>
+            <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+          </filter>
+          <filter id="glow-lock" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur"/>
+            <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+          </filter>
+          <linearGradient id="shield-grad" x1="100" y1="0" x2="100" y2="210" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#1e2a35"/>
+            <stop offset="100%" stop-color="#111820"/>
+          </linearGradient>
+          <linearGradient id="shield-stroke" x1="0" y1="0" x2="200" y2="210" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="rgba(37,211,102,0.5)"/>
+            <stop offset="50%" stop-color="rgba(74,158,255,0.4)"/>
+            <stop offset="100%" stop-color="rgba(37,211,102,0.2)"/>
+          </linearGradient>
+        </defs>
+
+        <!-- Shield background -->
+        <path
+          d="M100 8 L180 42 L180 110 C180 158 140 192 100 210 C60 192 20 158 20 110 L20 42 Z"
+          fill="url(#shield-grad)"
+          stroke="url(#shield-stroke)"
+          stroke-width="1.5"
+          filter="url(#glow-shield)"
+        />
+
+        <!-- Inner shield ring -->
+        <path
+          d="M100 24 L166 52 L166 110 C166 150 130 180 100 196 C70 180 34 150 34 110 L34 52 Z"
+          fill="none"
+          stroke="rgba(37,211,102,0.1)"
+          stroke-width="1"
+        />
+
+        <!-- Padlock body -->
+        <rect x="75" y="108" width="50" height="42" rx="6" fill="none" stroke="rgba(37,211,102,0.7)" stroke-width="1.8" filter="url(#glow-lock)"/>
+        <!-- Padlock shackle -->
+        <path d="M84 108 L84 94 Q84 80 100 80 Q116 80 116 94 L116 108" fill="none" stroke="rgba(37,211,102,0.5)" stroke-width="1.8" stroke-linecap="round"/>
+        <!-- Keyhole -->
+        <circle cx="100" cy="126" r="6" fill="none" stroke="rgba(37,211,102,0.6)" stroke-width="1.5"/>
+        <path d="M100 132 L100 140" stroke="rgba(37,211,102,0.6)" stroke-width="1.5" stroke-linecap="round"/>
+
+        <!-- Chat bubble small hint (top right of shield) -->
+        <rect x="126" y="34" width="34" height="24" rx="5" fill="rgba(74,158,255,0.08)" stroke="rgba(74,158,255,0.3)" stroke-width="1"/>
+        <path d="M130 56 L126 64 L138 56" fill="rgba(74,158,255,0.08)" stroke="rgba(74,158,255,0.3)" stroke-width="1" stroke-linejoin="round"/>
+        <line x1="133" y1="42" x2="153" y2="42" stroke="rgba(74,158,255,0.4)" stroke-width="1.2" stroke-linecap="round"/>
+        <line x1="133" y1="47" x2="148" y2="47" stroke="rgba(74,158,255,0.25)" stroke-width="1.2" stroke-linecap="round"/>
+
+        <!-- Checkmark dots on shield sides (showing guardrails) -->
+        <circle cx="38" cy="85" r="2" fill="rgba(37,211,102,0.4)"/>
+        <circle cx="38" cy="100" r="2" fill="rgba(37,211,102,0.3)"/>
+        <circle cx="38" cy="115" r="2" fill="rgba(74,158,255,0.3)"/>
+        <circle cx="162" cy="85" r="2" fill="rgba(37,211,102,0.4)"/>
+        <circle cx="162" cy="100" r="2" fill="rgba(37,211,102,0.3)"/>
+        <circle cx="162" cy="115" r="2" fill="rgba(74,158,255,0.3)"/>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<!-- Bottom meta row -->
+<div class="meta-row">
+  <div class="meta-left">
+    <span class="meta-item">Python</span>
+    <div class="meta-sep"></div>
+    <span class="meta-item">MIT License</span>
+    <div class="meta-sep"></div>
+    <span class="meta-item">Model Context Protocol</span>
+  </div>
+  <div class="badge-mcp">MCP</div>
+</div>
+
+</body>
+</html>
