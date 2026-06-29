@@ -1,0 +1,40 @@
+# nene-whatsapp-guard — configuration + recipient allowlist
+# Copy this to config/allowlist.yaml (git-ignored) and edit. The real file holds
+# real numbers, so it is NOT committed.
+
+# Where the authenticated WhatsApp bridge (whatsapp-mcp Go process) listens.
+bridge_url: "http://localhost:8080/api"
+
+# Fail-closed posture. When false, the engine refuses to message anyone who is
+# not in `recipients` below — even a raw phone number. This is the main control
+# that lets you trust autonomous sending.
+allow_unlisted: false
+
+# Require an explicit confirm_token (obtained from wa_preview) before a send.
+# Any subset of: unlisted, files, messages, all.  [] = never require.
+require_confirm_for:
+  - unlisted        # anything not on the allowlist
+  - files           # every file send must be previewed first
+
+# Throttle to stop a runaway loop from spamming the team.
+rate_limit:
+  per_minute: 10
+  per_hour: 60
+
+files:
+  max_size_mb: 100
+  allowed_ext: [".pdf", ".docx", ".xlsx", ".pptx", ".png", ".jpg", ".jpeg",
+                ".txt", ".md", ".csv", ".zip"]
+
+secrets:
+  on_detect: "block"   # block | warn  — what to do when text looks like it holds a credential
+
+# The people/groups the engine is allowed to message. `name` is what you pass as
+# `recipient`; matching is case-insensitive substring, or by number/JID.
+recipients:
+  - name: "Alex"
+    jid: "15551230001"
+    note: "example — vendor / team"
+  - name: "Team Alpha"
+    jid: "120363000000000000@g.us"
+    note: "example team group"

@@ -1,0 +1,19 @@
+# real allowlist holds real numbers — never commit it
+config/allowlist.yaml
+config/*.local.yaml
+
+# runtime state (audit log, rate state) lives in ~/.nene-whatsapp-guard/ but
+# guard against any local copies too
+*.jsonl
+ratestate.json
+
+# python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.DS_Store
