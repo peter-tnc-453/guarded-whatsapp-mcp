@@ -26,6 +26,15 @@ governance layer** that makes agent-driven WhatsApp safe enough to trust.
 > **This is not a Slack replacement.** No channels, no threads, no workspace UI. It makes
 > the WhatsApp you *already use* safe to automate.
 
+## See it in action
+
+<div align="center">
+<img src="assets/demo.gif" alt="Good sends go through, bad sends are blocked, all of it logged" width="92%">
+<br><sub>Good sends go through · a leaked key and an un-allowlisted number are blocked · files need a preview · everything is logged.</sub>
+</div>
+
+## How it works
+
 <div align="center">
 <img src="assets/architecture.png" alt="Architecture: every send passes through the guard" width="92%">
 </div>
