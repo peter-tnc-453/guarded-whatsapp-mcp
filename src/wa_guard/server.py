@@ -26,10 +26,28 @@ RATE_PATH = Path(DEFAULT_RATE_STATE)
 
 
 def _reload() -> None:
-    """Pick up edits to the allowlist without restarting the server."""
+    """Pick up edits to the allowlist without restarting the server.
+    Re-parsing YAML per call is intentional (live reload, no restart)."""
     global CFG, BRIDGE
     CFG = load_config()
     BRIDGE = Bridge(CFG.bridge_url)
+
+
+def _gated_send(v: guard.Verdict, base: dict[str, Any],
+                send_fn: Any) -> dict[str, Any]:
+    """Shared audit + dispatch tail for both send tools. `send_fn` is a zero-arg
+    callable that performs the actual bridge call and returns (sent, bridge_msg)."""
+    if not v.ok:
+        audit.record(AUDIT_PATH, {**base, "result": "blocked",
+                                  "reason": v.blocked_reason, "warnings": v.warnings})
+        return {"sent": False, **v.to_dict()}
+    try:
+        sent, msg = send_fn()
+    except BridgeError as e:
+        audit.record(AUDIT_PATH, {**base, "result": "error", "reason": str(e)})
+        return {"sent": False, "error": str(e), **v.to_dict()}
+    audit.record(AUDIT_PATH, {**base, "result": "sent" if sent else "failed", "bridge_msg": msg})
+    return {"sent": sent, "bridge_message": msg, **v.to_dict()}
 
 
 # --- read-only tools ---------------------------------------------------------
@@ -85,17 +103,7 @@ def wa_send_message(recipient: str, message: str, confirm_token: str | None = No
     base = {"tool": "wa_send_message", **audit.preview_text(message),
             "recipient_name": v.recipient_name, "recipient_jid": guard._mask_jid(v.recipient_jid),
             "allowlisted": v.is_listed}
-    if not v.ok:
-        audit.record(AUDIT_PATH, {**base, "result": "blocked", "reason": v.blocked_reason,
-                                  "warnings": v.warnings})
-        return {"sent": False, **v.to_dict()}
-    try:
-        sent, msg = BRIDGE.send_message(v.recipient_jid, message)
-    except BridgeError as e:
-        audit.record(AUDIT_PATH, {**base, "result": "error", "reason": str(e)})
-        return {"sent": False, "error": str(e), **v.to_dict()}
-    audit.record(AUDIT_PATH, {**base, "result": "sent" if sent else "failed", "bridge_msg": msg})
-    return {"sent": sent, "bridge_message": msg, **v.to_dict()}
+    return _gated_send(v, base, lambda: BRIDGE.send_message(v.recipient_jid, message))
 
 
 @mcp.tool()
@@ -114,17 +122,7 @@ def wa_send_file(recipient: str, file_path: str, caption: str = "",
             "recipient_jid": guard._mask_jid(v.recipient_jid), "allowlisted": v.is_listed,
             "display_filename": v.display_filename, "file_sha256": v.file_sha256,
             **({"caption": audit.preview_text(caption)} if caption else {})}
-    if not v.ok:
-        audit.record(AUDIT_PATH, {**base, "result": "blocked", "reason": v.blocked_reason,
-                                  "warnings": v.warnings})
-        return {"sent": False, **v.to_dict()}
-    try:
-        sent, msg = BRIDGE.send_file(v.recipient_jid, v.send_path, caption=caption)
-    except BridgeError as e:
-        audit.record(AUDIT_PATH, {**base, "result": "error", "reason": str(e)})
-        return {"sent": False, "error": str(e), **v.to_dict()}
-    audit.record(AUDIT_PATH, {**base, "result": "sent" if sent else "failed", "bridge_msg": msg})
-    return {"sent": sent, "bridge_message": msg, **v.to_dict()}
+    return _gated_send(v, base, lambda: BRIDGE.send_file(v.recipient_jid, v.send_path, caption=caption))
 
 
 def main() -> None:

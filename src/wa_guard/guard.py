@@ -52,9 +52,6 @@ def scan_secrets(text: str | None) -> list[dict[str, str]]:
         m = rx.search(text)
         if not m:
             continue
-        if label == "thai_national_id" and not _luhn_like_13(m.group(0)):
-            # keep it as a soft PII flag regardless; thai ID has its own checksum
-            pass
         sample = m.group(0)
         masked = sample[:4] + "…" + sample[-2:] if len(sample) > 8 else "…"
         findings.append({"label": label, "severity": severity, "sample": masked})
@@ -78,10 +75,6 @@ def _luhn(num: str) -> bool:
         total += d
         alt = not alt
     return total % 10 == 0
-
-
-def _luhn_like_13(num: str) -> bool:
-    return len(num) == 13 and num.isdigit()
 
 
 # --- filename sanitisation ---------------------------------------------------
