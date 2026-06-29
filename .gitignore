@@ -17,3 +17,9 @@ build/
 dist/
 .pytest_cache/
 .DS_Store
+
+# build + registry tooling
+mcp-publisher
+dist/
+build/
+*.egg-info/

@@ -34,7 +34,7 @@ secrets:
 recipients:
   - name: "Alex"
     jid: "15551230001"
-    note: "example — vendor / team"
+    note: "example contact"
   - name: "Team Alpha"
     jid: "120363000000000000@g.us"
-    note: "example team group"
+    note: "example group"

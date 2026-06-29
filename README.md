@@ -173,3 +173,6 @@ posture**, and add a test for every new check.
 ## License
 
 MIT — see [LICENSE](LICENSE). Security model & honest limitations in [SECURITY.md](SECURITY.md).
+
+<!-- mcp-name: io.github.peter-tnc-453/guarded-whatsapp-mcp -->
+

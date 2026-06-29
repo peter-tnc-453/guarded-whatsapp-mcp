@@ -1,0 +1,21 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.peter-tnc-453/guarded-whatsapp-mcp",
+  "title": "Guarded WhatsApp",
+  "description": "Govern WhatsApp for AI agents: allowlist, secret scanning, file validation, rate limiting, a confirm gate, and an audit log.",
+  "repository": {
+    "url": "https://github.com/peter-tnc-453/guarded-whatsapp-mcp",
+    "source": "github"
+  },
+  "version": "0.1.0",
+  "packages": [
+    {
+      "registryType": "pypi",
+      "identifier": "guarded-whatsapp-mcp",
+      "version": "0.1.0",
+      "transport": {
+        "type": "stdio"
+      }
+    }
+  ]
+}
