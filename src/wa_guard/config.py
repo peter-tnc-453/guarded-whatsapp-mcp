@@ -1,9 +1,9 @@
-"""Configuration loading for nene-whatsapp-guard.
+"""Configuration loading for guarded-whatsapp-mcp.
 
 Settings + recipient allowlist live in a YAML file. Resolution order:
   1. $WA_GUARD_CONFIG (explicit path)
   2. ./config/allowlist.yaml  (next to the repo)
-  3. ~/.nene-whatsapp-guard/allowlist.yaml
+  3. ~/.guarded-whatsapp-mcp/allowlist.yaml
 
 The real allowlist is intentionally git-ignored; ship allowlist.example.yaml instead.
 """
@@ -16,7 +16,7 @@ from typing import Any
 
 import yaml
 
-STATE_DIR = Path(os.path.expanduser("~/.nene-whatsapp-guard"))
+STATE_DIR = Path(os.path.expanduser("~/.guarded-whatsapp-mcp"))
 DEFAULT_AUDIT_PATH = STATE_DIR / "audit.jsonl"
 DEFAULT_RATE_STATE = STATE_DIR / "ratestate.json"
 

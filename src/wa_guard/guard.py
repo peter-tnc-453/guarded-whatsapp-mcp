@@ -1,4 +1,4 @@
-"""Security checks — the trust layer of nene-whatsapp-guard.
+"""Security checks — the trust layer of guarded-whatsapp-mcp.
 
 Every send passes through `evaluate()` which runs, in order:
   1. recipient allowlist resolution     (who can we message at all)

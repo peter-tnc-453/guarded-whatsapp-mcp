@@ -1,7 +1,7 @@
 [project]
-name = "nene-whatsapp-guard"
+name = "guarded-whatsapp-mcp"
 version = "0.1.0"
-description = "A governed WhatsApp MCP server: allowlist, secret scanning, file validation, rate limiting, confirmation gate, and audit log."
+description = "Govern & automate WhatsApp safely for AI agents: an MCP server with an allowlist, secret scanning, file validation, rate limiting, a confirmation gate, and an audit log."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
@@ -16,7 +16,7 @@ dependencies = [
 dev = ["pytest>=8.0"]
 
 [project.scripts]
-nene-whatsapp-guard = "wa_guard.server:main"
+guarded-whatsapp-mcp = "wa_guard.server:main"
 
 [build-system]
 requires = ["hatchling"]

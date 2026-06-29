@@ -1,4 +1,4 @@
-# nene-whatsapp-guard — configuration + recipient allowlist
+# guarded-whatsapp-mcp — configuration + recipient allowlist
 # Copy this to config/allowlist.yaml (git-ignored) and edit. The real file holds
 # real numbers, so it is NOT committed.
 

@@ -1,6 +1,6 @@
 # Security model
 
-`nene-whatsapp-guard` exists so that an autonomous assistant can be trusted to send
+`guarded-whatsapp-mcp` exists so that an autonomous assistant can be trusted to send
 WhatsApp to a team. This document states what it defends against and what it does not.
 
 ## Threats it addresses
@@ -31,7 +31,7 @@ WhatsApp to a team. This document states what it defends against and what it doe
 - **Least privilege transport.** The server talks only to `localhost` bridge endpoints;
   it never opens the network itself.
 - **Secrets stay out of git.** The real `config/allowlist.yaml` and the audit log
-  (`~/.nene-whatsapp-guard/`) are git-ignored. Only `allowlist.example.yaml` ships.
+  (`~/.guarded-whatsapp-mcp/`) are git-ignored. Only `allowlist.example.yaml` ships.
 - **Read/write separation.** `wa_list_recipients`, `wa_preview`, `wa_audit_tail` are
   read-only and side-effect-free; only `wa_send_*` mutate the world, and only through
   the gate.

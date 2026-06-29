@@ -1,4 +1,4 @@
-"""nene-whatsapp-guard — a governed WhatsApp MCP server.
+"""guarded-whatsapp-mcp — a governed WhatsApp MCP server.
 
 Wraps the authenticated whatsapp-bridge transport with an allowlist, secret
 scanning, file validation, rate limiting, a confirmation gate, and an append-only
@@ -17,7 +17,7 @@ from . import audit, guard
 from .bridge import Bridge, BridgeError
 from .config import DEFAULT_AUDIT_PATH, DEFAULT_RATE_STATE, load_config
 
-mcp = FastMCP("nene-whatsapp-guard")
+mcp = FastMCP("guarded-whatsapp-mcp")
 
 CFG = load_config()
 BRIDGE = Bridge(CFG.bridge_url)
